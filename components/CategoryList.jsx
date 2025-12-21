@@ -15,7 +15,8 @@ const CategoryList = () => {
   const handleDelete = async (id) => {
     setDeletingId(id);
     await mutateAsync(id);
-    queryClient.invalidateQueries({ queryKey: ["categories" ,  "products"] });
+    await queryClient.invalidateQueries({ queryKey: ["categories"] });
+    await queryClient.invalidateQueries({ queryKey: ["products"] });
     setDeletingId(null);
   };
 
