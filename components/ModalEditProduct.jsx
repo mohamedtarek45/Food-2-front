@@ -45,8 +45,8 @@ const ModalEditProduct = ({ isOpen, onClose, product }) => {
       image: Yup.mixed()
         .test(
           "fileSize",
-          "Max file size is 1.5MB",
-          (file) => !file || typeof file === "string" || (file instanceof File && file.size <= 1.5 * 1024 * 1024)
+          "Max file size is 4.5MB",
+          (file) => !file || typeof file === "string" || (file instanceof File && file.size <= 4.5 * 1024 * 1024)
         )
         .test(
           "fileType",
