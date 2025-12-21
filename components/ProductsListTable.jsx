@@ -11,17 +11,17 @@ import { queryClient } from "./ClientWrapper";
 import EditProductButton from "./EditProductButton";
 const ProductsListTable = () => {
   const { products, isPending, error } = useGetAllProducts();
-  const { categories } = useGetAllCategories();
+  const { categories , isPending: isLoadingCategories , error: errorCategories} = useGetAllCategories();
   const { mutateAsync, isPending: isDeleting } = useDeleteProduct();
   const [deletingId, setDeletingId] = useState(null);
 
-  if (isPending) {
+  if (isPending || isLoadingCategories) {
     return (
       <div className="px-4 py-8 text-center text-gray-500">Loading...</div>
     );
   }
 
-  if (error) {
+  if (error||errorCategories) {
     return (
       <div className="max-w-5xl mx-auto px-4 py-8 text-center text-red-600">
         Error: {error.message}
@@ -109,7 +109,7 @@ const ProductsListTable = () => {
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-500">
                     {
-                      categories&&categories.find(
+                       categories.find(
                         (category) => category.id === product.category
                       )?.name
                     }
