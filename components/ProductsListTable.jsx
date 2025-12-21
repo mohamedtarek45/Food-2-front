@@ -109,7 +109,7 @@ const ProductsListTable = () => {
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-500">
                     {
-                      categories.find(
+                      categories&&categories.find(
                         (category) => category.id === product.category
                       )?.name
                     }
