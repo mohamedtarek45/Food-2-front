@@ -245,7 +245,7 @@ const ModalAddProduct = ({ isOpen, onClose }) => {
             </button>
             <button
               type="submit"
-              disabled={isPending}
+              disabled={isPending || formik.isSubmitting}
               className="rounded-lg cursor-pointer bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
             >
               {isPending || formik.isSubmitting ? "Adding..." : "Add Product"}
