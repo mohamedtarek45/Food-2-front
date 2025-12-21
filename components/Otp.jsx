@@ -31,7 +31,7 @@ const Otp = () => {
         const user = JSON.parse(sessionStorage.getItem("user"));
         if (user) {
           await axios.post(
-            "http://localhost:4000/user/add-user",
+            process.env.NEXT_PUBLIC_API_URL + "/user/add-user",
             { user },
             {
               headers: {
