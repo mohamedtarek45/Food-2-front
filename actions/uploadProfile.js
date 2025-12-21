@@ -10,8 +10,8 @@ export async function uploadProfileAction(file) {
     if (!file.type.startsWith("image/")) {
       throw new Error("Only images allowed");
     }
-    if (file.size > 2 * 1024 * 1024) {
-      throw new Error("Max size is 2MB");
+    if (file.size > 4.5 * 1024 * 1024) {
+      throw new Error("Max size is 4.5MB");
     }
     const arrayBuffer = await file.arrayBuffer();
     const base64 = Buffer.from(arrayBuffer).toString("base64");
