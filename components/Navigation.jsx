@@ -2,7 +2,8 @@
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { FaUser } from "react-icons/fa6";
-import { IoMdNotifications } from "react-icons/io";
+import { BsCart4 } from "react-icons/bs";
+
 import Bar from "@/public/bar.svg";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -72,9 +73,9 @@ const Navigation = () => {
           <FaUser size={20} />
           <Link href="/products/basket" className="relative">
             {products.length > 0 && (
-              <span className="absolute top-0 right-0 size-2.25 rounded-full bg-[#FF0000]" />
+              <span className="absolute -top-2 z-5 -right-2 size-2.5 rounded-full bg-[#FF0000]" />
             )}
-            <IoMdNotifications size={24} />
+            <BsCart4 size={24} className="-translate-y-1" />
           </Link>
           <Bar
             className={`${

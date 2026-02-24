@@ -8,6 +8,7 @@ import { outfit } from "@/fonts";
 import { signOut } from "firebase/auth";
 import { auth } from "@/firebase";
 import { useRouter } from "next/navigation";
+import useUserStore from "@/store/userStore";
 const menuItems = [
   "Offers",
   "Featured Products",
@@ -26,6 +27,7 @@ const menuItems = [
 const BuzzerAppSidebar = ({ isOpen, onClose }) => {
   const router = useRouter();
   const firstRun = useRef(true);
+  const user = useUserStore((state) => state.user);
   useEffect(() => {
     if (firstRun.current) {
       firstRun.current = false;
@@ -73,7 +75,10 @@ const BuzzerAppSidebar = ({ isOpen, onClose }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <BuzzerFooter className="size-50 mx-auto" />
-        <hr className="border-white/50 mt-12.5 mb-7.5" />
+        <p className="text-white text-[20px] font-semibold  text-center">
+          Hello {user}
+        </p>
+        <hr className="border-white/50 mt-7.5 mb-7.5" />
         <div className={`space-y-3 ${outfit.className} overflow-auto`}>
           {menuItems.map((item, index) => (
             <div key={index} className="flex justify-between items-center">

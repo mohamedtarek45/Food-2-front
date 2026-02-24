@@ -36,3 +36,15 @@ export async function uploadProfileAction(file) {
     toast.error("Invalid file");
   }
 }
+
+
+// const result = await cloudinary.uploader.upload(dataUri, {
+//   folder: "NITGTASK",
+//   resource_type: "image",
+//   transformation: [
+//     {
+//       fetch_format: "webp",
+//       quality: "auto",
+//     },
+//   ],
+// }

@@ -1,6 +1,6 @@
 "use client";
 import { outfit } from "@/fonts";
-import RatingSection from "./RatingSection";
+
 import CategorySection from "./CategorySection";
 import  useProductFilterStore  from "@/store/productFilterStore";
 const FilterSection = () => {
@@ -16,7 +16,7 @@ const FilterSection = () => {
       className="rounded-sm border border-black/20 p-7.5"
       onSubmit={handleSubmit}
     >
-      <RatingSection />
+
       <CategorySection />
       <div className="text-right">
         <button

@@ -21,7 +21,7 @@ const page = () => {
             Welcome!
           </p>
           <p className={` opacity-50 2xl:mt-3`}>
-            Enter your number and we will send you a verification code.
+            Enter your Email and Password to login
           </p>
           <Login />
         </div>

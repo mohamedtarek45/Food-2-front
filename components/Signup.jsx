@@ -1,74 +1,77 @@
 "use client";
 import { outfit } from "@/fonts.js";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase.js";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export const Signup = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    if (window.recaptchaVerifier) {
-      window.recaptchaVerifier.clear();
-      window.recaptchaVerifier = null;
-    }
-    window.recaptchaVerifier = new RecaptchaVerifier(
-      auth,
-      "recaptcha-container",
-      {
-        size: "invisible",
-      }
-    );
-  }, []);
 
   const formik = useFormik({
     initialValues: {
-      type: "",
       fullName: "",
       email: "",
-      phoneNumber: "",
       password: "",
+      retypePassword: "",
     },
     validationSchema: Yup.object({
-      type: Yup.string().required("Required"),
       fullName: Yup.string().required("Required"),
       email: Yup.string().email("Invalid email").required("Required"),
-      phoneNumber: Yup.string().required("Required").length(13),
-      password: Yup.string().required("Required"),
+      password: Yup.string().required("Required").min(6),
+      retypePassword: Yup.string()
+        .oneOf([Yup.ref("password")], "Passwords must match")
+        .required("Required"),
     }),
     onSubmit: async (values, { resetForm }) => {
       setLoading(true);
-      const appVerifier = window.recaptchaVerifier;
-      if (appVerifier) {
-      }
       try {
-        const res = await axios.get(
+        let res = await axios.get(
           process.env.NEXT_PUBLIC_API_URL + "/user/check",
-          {
-            params: {
-              phoneNumber: values.phoneNumber,
-            },
-          }
+          { params: { email: values.email } },
         );
         if (res.data.message === "success") {
-          return toast.error("phone number already exist");
+          toast.error("Email already exists");
+          return;
         }
-        const confirmationResult = await signInWithPhoneNumber(
+        const SignUp = await createUserWithEmailAndPassword(
           auth,
-          "+201203013442",
-          appVerifier
+          values.email,
+          values.password,
         );
-        window.confirmationResult = confirmationResult;
-        sessionStorage.setItem("user", JSON.stringify(values));
-        window.phoneNumber = values.phoneNumber;
-        router.push("/verifyotp");
-      } catch (error) {
-        console.log(error);
+        const user = SignUp.user;
+
+        if (user) {
+          const token = await user.getIdToken();
+
+          try {
+            await axios.post(
+              process.env.NEXT_PUBLIC_API_URL + "/user/add-user",
+              {
+                fullName: values.fullName,
+                email: values.email,
+              },
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              },
+            );
+
+            toast.success("Account created successfully");
+            router.push("/home");
+          } catch (backendError) {
+            await user.delete();
+            toast.error("Failed to save data. Signup canceled.");
+            console.log("Backend failed:", backendError);
+          }
+        }
+      } catch (firebaseError) {
+        console.log("Firebase error:", firebaseError);
+        toast.error("Failed to create account.");
       } finally {
         setLoading(false);
         resetForm();
@@ -84,21 +87,8 @@ export const Signup = () => {
       <div id="recaptcha-container"></div>
 
       <input
-        name="type"
-        type="text"
-        placeholder="Type"
-        onChange={formik.handleChange}
-        onBlur={formik.handleBlur}
-        value={formik.values.type}
-        className={`w-full px-5 py-4 border  rounded-sm ${
-          formik.touched.type && formik.errors.type
-            ? "border-red-500"
-            : "border-black/20"
-        } `}
-      />
-      <input
-        type="text"
         name="fullName"
+        type="text"
         placeholder="Full Name"
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
@@ -109,9 +99,12 @@ export const Signup = () => {
             : "border-black/20"
         } `}
       />
+      {formik.errors.fullName && (
+        <p className="text-red-500">{formik.errors.fullName}</p>
+      )}
       <input
-        type="text"
         name="email"
+        type="text"
         placeholder="Email"
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
@@ -122,19 +115,9 @@ export const Signup = () => {
             : "border-black/20"
         } `}
       />
-      <input
-        type="tel"
-        name="phoneNumber"
-        placeholder="Phone Number e.g. +201xxxxxxxxx"
-        onChange={formik.handleChange}
-        onBlur={formik.handleBlur}
-        value={formik.values.phoneNumber}
-        className={`w-full px-5 py-4 border  rounded-sm ${
-          formik.touched.phoneNumber && formik.errors.phoneNumber
-            ? "border-red-500"
-            : "border-black/20"
-        } `}
-      />
+      {formik.errors.email && (
+        <p className="text-red-500">{formik.errors.email}</p>
+      )}
       <input
         type="password"
         name="password"
@@ -148,6 +131,25 @@ export const Signup = () => {
             : "border-black/20"
         } `}
       />
+      {formik.errors.password && (
+        <p className="text-red-500">{formik.errors.password}</p>
+      )}
+      <input
+        type="password"
+        name="retypePassword"
+        placeholder=" Retype Password"
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        value={formik.values.retypePassword}
+        className={`w-full px-5 py-4 border  rounded-sm ${
+          formik.touched.retypePassword && formik.errors.retypePassword
+            ? "border-red-500"
+            : "border-black/20"
+        } `}
+      />
+      {formik.errors.retypePassword && (
+        <p className="text-red-500">{formik.errors.retypePassword}</p>
+      )}
       <button
         disabled={loading}
         className={`mt-auto  cursor-pointer disabled:opacity-50 w-full py-3.25 border-3 hover:border-[#FFBB15] rounded-[10px] ${outfit.className} font-medium text-[20px] `}
@@ -155,7 +157,7 @@ export const Signup = () => {
         {loading ? (
           <div className="size-7 mx-auto rounded-full animate-spin border-black border-b"></div>
         ) : (
-          "Next"
+          "Sign Up"
         )}
       </button>
     </form>

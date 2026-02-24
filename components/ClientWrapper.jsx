@@ -4,26 +4,46 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import useUserStore from "@/store/userStore";
+import axios from "axios";
 export const queryClient = new QueryClient();
 const ClientWrapper = ({ isProtected, children }) => {
+  const setUser = useUserStore((state) => state.setUser);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   const router = useRouter();
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (isProtected && !user) {
-        router.replace("/login");
-        return;
-      }
+    useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      try {
+        if (user) {
+          const res = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/user/check`,
+            { params: { email: user.email } }
+          );
 
-      if (!isProtected && user) {
-        router.replace("/home");
-        return;
-      }
+          if (res.data.message === "success") {
+            setUser(res.data.user.fullName);
+          }
 
-      setCheckingAuth(false);
+          if (!isProtected) {
+            router.replace("/home");
+            return;
+          }
+        } else {
+          if (isProtected) {
+            router.replace("/login");
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Auth error:", error);
+      } finally {
+        setCheckingAuth(false);
+      }
     });
-  }, [router, isProtected]);
+
+    return () => unsubscribe(); 
+  }, [isProtected, router, setUser]);
   if (checkingAuth) return null;
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

@@ -20,7 +20,7 @@ const Page5 = () => {
         <div className="relative w-full h-140.5 ">
           <Image src="/Map.webp" alt="Logo" fill className="object-cover " />
         </div>
-        <DataPage3 />
+
       </div>
     </div>
   );

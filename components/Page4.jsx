@@ -3,7 +3,7 @@ import Decorate from "@/public/Decorate.svg";
 import Image from "next/image";
 const Page4 = () => {
   return (
-    <div className="my-12.5 relative max-w-screen overflow-hidden">
+    <div className="my-12.5 relative max-w-screen overflow-hidden" id="about">
       <div className="hidden md:block absolute top-1/2 -translate-y-1/2 left-0 md:-translate-x-3/4 3xl:-translate-x-1/2 -z-10">
         <div className="relative size-86.75">
           <Image src="/Burger.webp" alt="Logo" fill className="object-contain" />
